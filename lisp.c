@@ -29,8 +29,8 @@
 
 #include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #define     TRUE 1
@@ -83,7 +83,7 @@ makestring(void)
 
 	char           *strg;
 
-	strg = (char *) malloc(20);	/* Literals can be at most of 20 char */
+	strg = (char *) malloc(32);	/* Literals can be at most of 20 char */
 	assert(strg != 0);	/* Check for malloc failing */
 	strcpy(strg, "");	/* Make it 0 */
 	return strg;
@@ -197,6 +197,7 @@ gettok(void)
 {
 	char            ch;
 	int             i;
+        char tmpstr[32];
 
 	ch = gtchar();
 	switch (ch) {
@@ -213,20 +214,24 @@ gettok(void)
 			return QTOK;
 		}
 	default:{
-			str_global[0] = ch;
+                        tmpstr[0] = ch;
+                        tmpstr[1] = 0;
 			i = 0;
 			while ((!feof(stdin)) && isalpha(ch)) {
 				i++;
 				ch = getchar();
-				str_global[i] = ch;	/* Add ch to symbol
+				tmpstr[i] = ch;	/* Add ch to symbol
 							 * string */
 			}
 
 			if ((ch == ' ') || (ch == '(') || (ch == ')')) {
-				str_global[i] = '\0';
+				tmpstr[i] = 0;
 				pchr = ch;
 			} else
-				str_global[i] = '\0';	/* Terminate the string */
+				tmpstr[i] = 0;	/* Terminate the string */
+
+                        str_global = strdup(tmpstr);
+
 			return SYMTOK;
 		}
 	}
@@ -626,7 +631,7 @@ eval(cellcursor list)
 		if (tempcur != 0)
 			temp_res = M[tempcur].binding;
 		else {
-			printf("Error:eval:-- %s -- not defined", M[list].data);
+			printf("Error:eval:-- %s -- not defined ", M[list].data);
 			return 0;
 		}
 	} else {
@@ -692,7 +697,7 @@ maketruecell()
 }
 
 
-main()
+int main()
 {
 	cellcursor      tempcur;
 
