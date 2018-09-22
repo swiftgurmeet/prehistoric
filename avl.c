@@ -1,10 +1,11 @@
 #include  <time.h>
 #include  <stdio.h>
 #include  <stdlib.h>
+#include  <assert.h>
 
 #define TRUE  1
 #define FALSE 0
-#define MAXNUMB 10
+#define MAXNUMB 12
 
 enum  {	EH , RH , LH };       /* Equal high , right high , left high */
 struct node {
@@ -30,7 +31,7 @@ void print_num(int number)  /* Prints an int neatly */
 	static int i = 0;
 
         if (!(i % 10)) printf("\n");
-        printf("%10d",number);
+        printf("%10d ",number);
         i++;
 }
 void generate_random()
@@ -42,8 +43,7 @@ void generate_random()
         int dup ;            /* To check if duplicate no. is added to array. */
 
         printf("\nNumbers before insertion:\n");
-/*	randomize();   /* initialize the random number
-                                                  generator. */
+/*	randomize();    initialize the random number generator. */
         for (i=0;i<MAXNUMB;){
                 number = rand();           /* generate a random integer */
                 dup = 0;
@@ -342,27 +342,29 @@ void leftbalance2(Nodeptr *p,int *pshorter)
         case LH :
                 {
 			w = x->right;
-                        switch(w->bf){
-                        case EH :
+                        if(w){ 
+                                switch(w->bf){
+                                case EH :
+                                        (*p)->bf = EH ;
+                                        x->bf = EH ;
+                                        break;
+                                case RH :
+			        	(*p)->bf = RH ;
+                                        x->bf = EH ;
+                                        break;
+                                case LH :
                                 (*p)->bf = EH ;
-                                x->bf = EH ;
-                                break;
-                        case RH :
-				(*p)->bf = RH ;
-                                x->bf = EH ;
-                                break;
-                        case LH :
-                                (*p)->bf = EH ;
-				x->bf = LH ;
-                                break;
+			        	x->bf = LH ;
+                                        break;
+                                }
+                                w->bf = EH;
+		        	rotateright(&x);
+                                (*p)->right = x;
+	        		rotateleft(p);
+	        		*pshorter = TRUE;
+                                double_rot_del++ ;
+        			break;
                         }
-                        w->bf = EH;
-			rotateright(&x);
-                        (*p)->right = x;
-			rotateleft(p);
-			*pshorter = TRUE;
-                        double_rot_del++ ;
-			break;
                 }
         }
 }
